@@ -1,0 +1,31 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.extraarmor.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "CombatRulesMixin",
+    "EnchantmentHelperMixin",
+    "InventoryMenuMixin",
+    "InventoryMixin",
+    "LivingEntityMixin",
+    "WearableChecksMixin",
+    "WearableChecks2Mixin",
+    "PowderSnowBlockMixin",
+    "RangedAttributeAccessor",
+    "ServerGamePacketListenerImplMixin"
+  ],
+  "client": [
+    "client.CreativeModeInventoryScreenMixin",
+    "client.CreativeSlotWrapperMixin",
+    "client.CustomHeadLayerMixin",
+    "client.ElytraLayerMixin",
+    "client.HumanoidArmorLayerMixin",
+    "client.InventoryScreenMixin",
+    "client.LocalPlayerMixin",
+    "client.SlotAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

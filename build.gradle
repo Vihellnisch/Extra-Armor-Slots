@@ -1,0 +1,84 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.78'
+}
+
+version = mod_version
+group = mod_group_id
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+repositories {
+    mavenCentral()
+}
+
+// Scripted in-game checks (./gradlew runTourClient) live in their own source set, never in the jar.
+sourceSets {
+    tour {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    tourImplementation.extendsFrom implementation
+}
+
+neoForge {
+    version = project.neo_version
+
+    addModdingDependenciesTo(sourceSets.tour)
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+        // ./gradlew runTourClient - opens run-tour/saves/extra_armor_test, runs the checks in
+        // ExtraArmorTour, screenshots each stop into run-tour/screenshots and quits
+        tourClient {
+            client()
+            sourceSet = sourceSets.tour
+            gameDirectory = project.file('run-tour')
+            systemProperty 'extraarmor.tour', 'true'
+            systemProperty 'extraarmor.tour.showcase', System.getProperty('tourShowcase', 'false')
+            systemProperty 'extraarmor.tour.only', System.getProperty('tourOnly', '')
+        }
+    }
+
+    mods {
+        extraarmor {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.tour
+        }
+    }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+        minecraft_version      : minecraft_version,
+        minecraft_version_range: minecraft_version_range,
+        neo_version            : neo_version,
+        neo_version_range      : neo_version_range,
+        loader_version_range   : loader_version_range,
+        mod_id                 : mod_id,
+        mod_name               : mod_name,
+        mod_authors            : mod_authors,
+        mod_description        : mod_description,
+        mod_version            : mod_version
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}

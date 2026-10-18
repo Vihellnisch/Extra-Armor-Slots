@@ -1,0 +1,7 @@
+{
+  "extraarmor.configuration.title": "Extra Armor Slots",
+  "extraarmor.configuration.extraArmorSets": "Extra armor sets",
+  "extraarmor.configuration.extraArmorSets.tooltip": "How many extra armor sets (columns) a player can wear, 1 to 10. Lowering it gives the armor in removed columns back.",
+  "extraarmor.configuration.raisedCaps": "Raised armor caps",
+  "extraarmor.configuration.raisedCaps.tooltip": "On: every extra set raises the armor, toughness and protection caps, so stacked sets keep making you tougher. Off: vanilla caps."
+}
