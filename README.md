@@ -5,6 +5,10 @@ A Minecraft mod that adds extra armor columns right next to the vanilla armor sl
 - **Minecraft** 1.21.1, **NeoForge** 21.1+
 - No other dependencies
 
+## Download
+
+Get the latest jar from the **[Releases page](https://github.com/Vihellnisch/Extra-Armor-Slots/releases/latest)** and put it in your `mods` folder. It's needed on both the client and the server.
+
 ## What's in it
 
 - **A second armor column** grows out of the inventory's left edge, styled like the vanilla GUI. It's in the creative inventory too, and it hides while the recipe book is open.
