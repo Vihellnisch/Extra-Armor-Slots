@@ -39,8 +39,10 @@ final class ExtraArmorTourFlows {
                 case "creative_place" -> creativePlace(mc, within);
                 case "survival_place" -> survivalPlace(mc, within);
                 case "stratagem_keys" -> stratagemKeys(mc, within);
-                case "elytra_glide" -> elytraGlide(mc, within);
-                case "ten_sets_screen" -> nextPage(mc, within);
+                case "elytra_glide", "elytra_glide_back" -> elytraGlide(mc, within);
+                case "ten_sets_screen" -> {
+                    if (!ExtraArmorTour.SHOWCASE) nextPage(mc, within);
+                }
                 default -> {
                 }
             }

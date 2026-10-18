@@ -265,6 +265,12 @@ public final class ExtraArmorTour {
                 look(p);
             });
         }));
+        s.add(new Stop("elytra_wings_back", (p, l) -> {
+            // showcase: wings from the extra chest slot over a normal diamond chestplate
+            wear(p, l, "diamond", null);
+            ExtraArmor.inventory(p).setStackInSlot(1, new ItemStack(Items.ELYTRA));
+            look(p);
+        }));
         s.add(new Stop("shift_click", (p, l) -> {
             wear(p, l, "diamond", null);
             p.getInventory().clearContent();
@@ -281,6 +287,7 @@ public final class ExtraArmorTour {
         }));
         s.add(new Stop("inventory_screen", (p, l) -> {
             wear(p, l, "diamond", "netherite");
+            dressInventory(p);
             look(p);
             p.setGameMode(GameType.SURVIVAL); // in creative, E opens the creative inventory instead
         }));
@@ -307,6 +314,7 @@ public final class ExtraArmorTour {
             sets(3);
             p.getInventory().clearContent(); // clears worn armor too, so before putting armor on
             wear(p, l, "diamond", "netherite");
+            dressInventory(p);
             ExtraArmorInventory inv = ExtraArmor.inventory(p);
             for (EquipmentSlot slot : ExtraArmor.SLOTS) {
                 inv.setStackInSlot(ExtraArmor.index(1, slot), piece("iron", slot));
@@ -409,7 +417,8 @@ public final class ExtraArmorTour {
         String only = System.getProperty("extraarmor.tour.only", "");
         if (!only.isEmpty()) s.removeIf(stop -> !stop.name().startsWith(only));
         if (SHOWCASE) {
-            List<String> keep = List.of("mod_set_bonus", "inventory_screen", "three_sets_screen", "ten_sets_screen", "creative_screen", "extra_only_front", "both_front", "mixed_front");
+            List<String> keep = List.of("inventory_screen", "three_sets_screen", "ten_sets_screen", "creative_screen", "extra_only_front",
+                    "both_front", "mixed_front", "elytra_wings_back");
             s.removeIf(stop -> !keep.contains(stop.name()));
         }
         return s;
@@ -432,6 +441,21 @@ public final class ExtraArmorTour {
             if (slot == EquipmentSlot.FEET && !e.isEmpty()) e.enchant(ench(l, Enchantments.PROTECTION), 4);
             inv.setStackInSlot(i, e);
         }
+    }
+
+    /** Showcase screenshots: a lived-in inventory instead of an empty grid. */
+    private static void dressInventory(ServerPlayer p) {
+        if (!SHOWCASE) return;
+        Item[] items = {Items.NETHERITE_SWORD, Items.DIAMOND_PICKAXE, Items.BOW, Items.COOKED_BEEF, Items.TORCH, Items.ENDER_PEARL,
+                Items.OAK_PLANKS, Items.GOLDEN_APPLE, Items.WATER_BUCKET};
+        int[] counts = {1, 1, 1, 32, 64, 12, 64, 6, 1};
+        for (int i = 0; i < items.length; i++) p.getInventory().setItem(i, new ItemStack(items[i], counts[i]));
+        p.getInventory().setItem(9, new ItemStack(Items.ARROW, 64));
+        p.getInventory().setItem(13, new ItemStack(Items.IRON_INGOT, 23));
+        p.getInventory().setItem(17, new ItemStack(Items.SHIELD));
+        p.getInventory().setItem(22, new ItemStack(Items.EXPERIENCE_BOTTLE, 16));
+        p.getInventory().setItem(30, new ItemStack(Items.COBBLESTONE, 64));
+        p.getInventory().selected = 0;
     }
 
     /** Changes the configured number of extra sets the way a config edit would. */
@@ -513,6 +537,7 @@ public final class ExtraArmorTour {
         p.onUpdateAbilities();
         p.teleportTo(l, C.getX() + 0.5D, C.getY() + 1.0D, C.getZ() + 0.5D, 180.0F, 10.0F);
         p.setYHeadRot(180.0F);
+        p.setYBodyRot(180.0F);
     }
 
     @SubscribeEvent
@@ -545,6 +570,7 @@ public final class ExtraArmorTour {
         int stop = (ticks - FIRST_STOP) / STOP_LENGTH;
         if (stop >= STOPS.size()) return;
         player.setGameMode(GameType.CREATIVE);
+        if (SHOWCASE) player.removeAllEffects();
         try {
             STOPS.get(stop).action().accept(player, level);
         } catch (RuntimeException e) {

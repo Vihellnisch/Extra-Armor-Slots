@@ -70,8 +70,10 @@ public final class ExtraArmorTourClient {
         }
         String name = ExtraArmorTour.STOP_NAMES.get(stop);
         boolean screenStop = name.endsWith("_screen");
-        mc.options.hideGui = !screenStop;
-        mc.options.setCameraType(name.endsWith("_front") ? CameraType.THIRD_PERSON_FRONT : CameraType.FIRST_PERSON);
+        mc.options.hideGui = ExtraArmorTour.SHOWCASE || !screenStop; // screens still draw with F1 on
+        if (ExtraArmorTour.SHOWCASE) mc.getToasts().clear();
+        mc.options.setCameraType(name.endsWith("_front") ? CameraType.THIRD_PERSON_FRONT
+                : name.endsWith("_back") ? CameraType.THIRD_PERSON_BACK : CameraType.FIRST_PERSON);
         if (screenStop && within >= 30 && screenFor != stop) {
             screenFor = stop;
             openScreen(mc, name);
@@ -87,6 +89,28 @@ public final class ExtraArmorTourClient {
             } catch (ReflectiveOperationException | LinkageError e) {
                 LogUtils.getLogger().error("TOUR could not call Orbital Strike client", e);
             }
+        }
+        if (ExtraArmorTour.SHOWCASE && mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> gui) {
+            // park the mouse on the player preview: no slot tooltip, and the player looks at the camera
+            int x = gui.getGuiLeft() + (gui instanceof CreativeModeInventoryScreen ? 89 : 51);
+            int y = gui.getGuiTop() + (gui instanceof CreativeModeInventoryScreen ? 26 : 40);
+            try {
+                java.lang.reflect.Field fx = net.minecraft.client.MouseHandler.class.getDeclaredField("xpos");
+                java.lang.reflect.Field fy = net.minecraft.client.MouseHandler.class.getDeclaredField("ypos");
+                fx.setAccessible(true);
+                fy.setAccessible(true);
+                fx.setDouble(mc.mouseHandler, x * mc.getWindow().getGuiScale());
+                fy.setDouble(mc.mouseHandler, y * mc.getWindow().getGuiScale());
+            } catch (ReflectiveOperationException e) {
+                LogUtils.getLogger().error("TOUR could not move the mouse", e);
+            }
+        }
+        if (name.endsWith("_back") || name.endsWith("_front")) {
+            // the local player's body turns on its own; line it up with the head for straight shots
+            mc.player.setYBodyRot(mc.player.getYRot());
+            mc.player.yBodyRotO = mc.player.getYRot();
+            mc.player.setYHeadRot(mc.player.getYRot());
+            mc.player.yHeadRotO = mc.player.getYRot();
         }
         if (shot != stop && within >= ExtraArmorTour.SHOT_AT) {
             shot = stop;
